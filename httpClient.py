@@ -2,8 +2,7 @@ import argparse
 import requests
 import validators
 import sys
-
-
+import warnings
 parser = argparse.ArgumentParser(description="httpClient:)")
 parser.add_argument(
     "URL",
@@ -42,8 +41,8 @@ parser.add_argument("--timeout")
 
 try:
     args = parser.parse_args()
-except Exception as Argument:
-    print(type(Argument))
+except:
+    print("Argument Is Invalid")
     sys.exit()
 
 url = args.URL[0]
@@ -54,7 +53,6 @@ data = args.data
 json = args.json
 file = args.file
 timeout = args.timeout
-# print(url, method, headers, queries, data, json, file
 #       )
 
 
@@ -67,3 +65,23 @@ def urlCheck(url):
         sys.exit()
 
 
+print(url, method, headers, queries, data, json, file)
+
+
+def header(headers):
+    header_dic = {}
+    for i in headers:
+        list = i.split(",")
+        for j in range(len(list)):
+            key_value = list[j].split(":")
+            key = key_value[0].lower()
+            value = key_value[1]
+            print(header_dic)
+            if key in header_dic.keys():
+                warning = str(key) + " is already exists"
+                warnings.warn(warning)
+                header_dic[key] = value
+            else:
+                header_dic[key] = value
+    print(header_dic)
+    return header_dic
