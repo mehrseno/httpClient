@@ -49,6 +49,7 @@ url = args.URL[0]
 method = args.method
 headers = args.headers
 queries = args.queries
+data = args.data
 json = args.json
 file = args.file
 timeout = args.timeout
@@ -107,17 +108,28 @@ def request(u, m, h, q, d, j, f):
     return requests.request(u, m, headers=h, params=q, data=d, json=j, file=f)
 
 
-def data(headers_dic):
+def dataFunction(headers_dic):
     if "content-type" not in headers_dic.keys():
         headers_dic["content-type"] = "application/x-www-form-urlencoded"
-    data = args.data
-    return data, headers_dic
+    return headers_dic
+
+
+def jsonFunction(headers_dic):
+    if "content-type" not in headers_dic.keys():
+        headers_dic["content-type"] = "application/json"
+    return headers_dic
+
 
 
 urlCheck(url)
 headers_dic = header(headers)
 queries_dic = query(queries)
-data, headers_dic = data(headers_dic)
-response = request(url, method, headers_dic, queries_dic, data, json, file)
+if data is not None and json is not None:
+    print("please enter data or json, not both of them")
+    sys.exit()
+else:
+    headers_dic = dataFunction(headers_dic)
+    headers_dic = jsonFunction(headers_dic)
+    response = request(url, method, headers_dic, queries_dic, data, json, file)
 
 
