@@ -53,9 +53,9 @@ data = args.data
 json = args.json
 file = args.file
 timeout = args.timeout
-#       )
 
 print(url, method, headers, queries, data, json, file)
+
 
 def urlCheck(url):
     valid = validators.url(url)
@@ -64,8 +64,6 @@ def urlCheck(url):
     else:
         print("Invalid url\n", "terminated!")
         sys.exit()
-
-
 
 
 def header(headers):
@@ -105,6 +103,15 @@ def query(queries):
     print(queries_dic)
     return queries_dic
 
-# urlCheck(url)
-# header(headers)
-query(queries)
+
+def request(u, m, h, q, d, j, f):
+    return requests.request(u, m, headers=h, params=q, data=d, json=j, file=f)
+
+
+
+urlCheck(url)
+headers_dic = header(headers)
+queries_dic = query(queries)
+response = request(url, method, headers_dic, queries_dic, data, json, file)
+
+
