@@ -55,6 +55,7 @@ file = args.file
 timeout = args.timeout
 #       )
 
+print(url, method, headers, queries, data, json, file)
 
 def urlCheck(url):
     valid = validators.url(url)
@@ -65,7 +66,6 @@ def urlCheck(url):
         sys.exit()
 
 
-print(url, method, headers, queries, data, json, file)
 
 
 def header(headers):
@@ -85,3 +85,26 @@ def header(headers):
                 header_dic[key] = value
     print(header_dic)
     return header_dic
+
+
+def query(queries):
+    queries_dic = {}
+    for i in queries:
+        list = i.split("&")
+        for j in range(len(list)):
+            key_value = list[j].split("=")
+            key = key_value[0].lower()
+            value = key_value[1]
+            print(queries_dic)
+            if key in queries_dic.keys():
+                warning = str(key) + " is already exists"
+                warnings.warn(warning)
+                queries_dic[key] = value
+            else:
+                queries_dic[key] = value
+    print(queries_dic)
+    return queries_dic
+
+# urlCheck(url)
+# header(headers)
+query(queries)
