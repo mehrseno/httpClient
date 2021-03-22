@@ -3,6 +3,7 @@ import requests
 import validators
 import sys
 import warnings
+from requests.exceptions import Timeout
 parser = argparse.ArgumentParser(description="httpClient:)")
 parser.add_argument(
     "URL",
@@ -34,10 +35,13 @@ parser.add_argument(
     "-D",
     "--data"
 )
+parser.add_argument(
+    "--timeout",
+    type = float
+)
 
 parser.add_argument("--json")
 parser.add_argument("--file")
-parser.add_argument("--timeout")
 
 try:
     args = parser.parse_args()
@@ -104,8 +108,12 @@ def query(queries):
     return queries_dic
 
 
-def request(u, m, h, q, d, j, f):
-    return requests.request(u, m, headers=h, params=q, data=d, json=j, file=f)
+def request(u, m, h, q, d, j, f, t):
+    try:
+        return requests.request(u, m, headers=h, params=q, data=d, json=j, file=f, timeout=t)
+    except Timeout:
+        print('The request timed out')
+        sys.exit()
 
 
 def dataFunction(headers_dic):
@@ -120,7 +128,6 @@ def jsonFunction(headers_dic):
     return headers_dic
 
 
-
 urlCheck(url)
 headers_dic = header(headers)
 queries_dic = query(queries)
@@ -130,6 +137,6 @@ if data is not None and json is not None:
 else:
     headers_dic = dataFunction(headers_dic)
     headers_dic = jsonFunction(headers_dic)
-    response = request(url, method, headers_dic, queries_dic, data, json, file)
+    response = request(url, method, headers_dic, queries_dic, data, json, file, timeout)
 
 
