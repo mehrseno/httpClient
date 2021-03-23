@@ -108,35 +108,45 @@ def query(queries):
     return queries_dic
 
 
-def request(u, m, h, q, d, j, f, t):
+def request(m, u, h, q, d, j, t):
     try:
-        return requests.request(u, m, headers=h, params=q, data=d, json=j, file=f, timeout=t)
+        return requests.request(m, u, headers=h, params=q, data=d, json=j, timeout=t)
     except Timeout:
         print('The request timed out')
         sys.exit()
 
 
 def dataFunction(headers_dic):
-    if "content-type" not in headers_dic.keys():
+    if "content-type" not in headers_dic.keys() or headers_dic is None:
         headers_dic["content-type"] = "application/x-www-form-urlencoded"
     return headers_dic
 
 
 def jsonFunction(headers_dic):
-    if "content-type" not in headers_dic.keys():
+    if "content-type" not in headers_dic.keys() or headers_dic is None:
         headers_dic["content-type"] = "application/json"
     return headers_dic
 
 
 urlCheck(url)
-headers_dic = header(headers)
-queries_dic = query(queries)
+if headers is not None:
+    headers_dic = header(headers)
+else:
+    headers_dic = None
+
+if queries is not None:
+    queries_dic = query(queries)
+else:
+    queries_dic = None
+
 if data is not None and json is not None:
     print("please enter data or json, not both of them")
     sys.exit()
 else:
-    headers_dic = dataFunction(headers_dic)
-    headers_dic = jsonFunction(headers_dic)
-    response = request(url, method, headers_dic, queries_dic, data, json, file, timeout)
+    if data:
+        headers_dic = dataFunction(headers_dic)
+    elif json:
+        headers_dic = jsonFunction(headers_dic)
+    response = request(method, url, headers_dic, queries_dic, data, json, timeout)
 
-
+print(response)
