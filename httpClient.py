@@ -58,7 +58,7 @@ json = args.json
 file = args.file
 timeout = args.timeout
 
-print(url, method, headers, queries, data, json, file)
+print("url : ", url, "\n", "method :", method, "\n", "headers : ", headers, "\n", "queries : ", queries, "\n", "data : ", data, "\n", "json : ", json, "\n", "file : ", file)
 
 
 def urlCheck(url):
@@ -110,19 +110,20 @@ def query(queries):
 
 def request(m, u, h, q, d, j, t):
     try:
+
         return requests.request(m, u, headers=h, params=q, data=d, json=j, timeout=t)
     except Timeout:
         print('The request timed out')
         sys.exit()
 
 
-def dataFunction(headers_dic):
+def data_function(headers_dic):
     if "content-type" not in headers_dic.keys() or headers_dic is None:
         headers_dic["content-type"] = "application/x-www-form-urlencoded"
     return headers_dic
 
 
-def jsonFunction(headers_dic):
+def json_function(headers_dic):
     if "content-type" not in headers_dic.keys() or headers_dic is None:
         headers_dic["content-type"] = "application/json"
     return headers_dic
@@ -144,9 +145,12 @@ if data is not None and json is not None:
     sys.exit()
 else:
     if data:
-        headers_dic = dataFunction(headers_dic)
+        headers_dic = data_function(headers_dic)
     elif json:
-        headers_dic = jsonFunction(headers_dic)
+        headers_dic = json_function(headers_dic)
     response = request(method, url, headers_dic, queries_dic, data, json, timeout)
 
-print(response)
+print("\n\n\n", method, response.status_code, response.reason, "\n++++++++++++++++++++++++++++++++++++++++++\n")
+for key, value in response.headers.items():
+    print(key, "->", value)
+print("\n++++++++++++++++++++++++++++++++++++++++++\n", response.text)
