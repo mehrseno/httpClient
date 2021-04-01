@@ -5,6 +5,7 @@ import sys
 import warnings
 import re
 import json
+# header_dic = {}
 from requests.exceptions import Timeout
 parser = argparse.ArgumentParser(description="httpClient:)")
 parser.add_argument(
@@ -73,22 +74,22 @@ def urlCheck(url):
 
 
 def header(headers):
-    header_dic = {}
+    headers_dic = {}
     for i in headers:
         list = i.split(",")
         for j in range(len(list)):
             key_value = list[j].split(":")
             key = key_value[0].lower()
             value = key_value[1]
-            print(header_dic)
-            if key in header_dic.keys():
+            print(headers_dic)
+            if key in headers_dic.keys():
                 warning = str(key) + " is already exists"
                 warnings.warn(warning)
-                header_dic[key] = value
+                headers_dic[key] = value
             else:
-                header_dic[key] = value
-    print(header_dic)
-    return header_dic
+                headers_dic[key] = value
+    print(headers_dic)
+    return headers_dic
 
 
 def query(queries):
@@ -110,6 +111,21 @@ def query(queries):
     return queries_dic
 
 
+def file_function(headers_dic):
+    if file is None:
+        file_dic = {}
+        return file_dic
+    try:
+        file_value = open(file, "rb")
+        file_dic = {}
+        file_dic["file_key"] = file_value
+        print('file_dic', file_dic)
+    except IOError:
+        print("Error: File does not appear to exist.")
+        sys.exit()
+    if "content-type" not in headers_dic.keys() or headers_dic is None:
+        headers_dic["content-type"] = "application/octet-stream"
+    return file_dic
 
 
 def data_function(headers_dic):
@@ -118,23 +134,22 @@ def data_function(headers_dic):
         warnings.warn("data's format is wrong, it must be : application/x-www-form-urlencoded")
     if "content-type" not in headers_dic.keys() or headers_dic is None:
         headers_dic["content-type"] = "application/x-www-form-urlencoded"
-    return headers_dic
 
 
 def json_function(headers_dic):
     try:
-        json.loads(jsn)
+        j = json.loads(jsn)
     except:
         warnings.warn("jason's format is wrong, it must be : application/json")
+        j = jsn
     if "content-type" not in headers_dic.keys() or headers_dic is None:
         headers_dic["content-type"] = "application/json"
-    return headers_dic
+    return j
 
 
-def request(m, u, h, q, d, j, t):
+def request(m, u, h, q, d, j, t, f):
     try:
-
-        return requests.request(m, u, headers=h, params=q, data=d, json=j, timeout=t)
+        return requests.request(m, u, headers=h, params=q, data=d, json=j.loads(), timeout=t, files=f)
     except Timeout:
         print('The request timed out')
         sys.exit()
@@ -142,24 +157,26 @@ def request(m, u, h, q, d, j, t):
 
 urlCheck(url)
 if headers is not None:
-    headers_dic = header(headers)
+   headers_dic = header(headers)
 else:
-    headers_dic = None
+    headers_dic = {}
 
 if queries is not None:
     queries_dic = query(queries)
 else:
-    queries_dic = None
+    queries_dic = {}
 
 if data is not None and jsn is not None:
     print("please enter data or json, not both of them")
     sys.exit()
 else:
     if data:
-        headers_dic = data_function(headers_dic)
-    elif jsn:
-        headers_dic = json_function(headers_dic)
-    response = request(method, url, headers_dic, queries_dic, data, jsn, timeout)
+       data_function(headers_dic)
+    if jsn:
+      j = json_function(headers_dic)
+    elif file:
+        file_dic = file_function(headers_dic)
+    response = request(method, url, headers_dic, queries_dic, data, j, timeout, file_dic)
 
 print("\n\n\n", method, response.status_code, response.reason, "\n++++++++++++++++++++++++++++++++++++++++++\n")
 for key, value in response.headers.items():
