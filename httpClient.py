@@ -3,6 +3,7 @@ import requests
 import validators
 import sys
 import warnings
+import re
 from requests.exceptions import Timeout
 parser = argparse.ArgumentParser(description="httpClient:)")
 parser.add_argument(
@@ -118,6 +119,9 @@ def request(m, u, h, q, d, j, t):
 
 
 def data_function(headers_dic):
+    flag = bool(re.fullmatch(r"(\w+=\w+)(&\w+=\w+)*", str(data)))
+    if flag == False:
+        warnings.warn("data's format is wrong, it must be : application/x-www-form-urlencoded")
     if "content-type" not in headers_dic.keys() or headers_dic is None:
         headers_dic["content-type"] = "application/x-www-form-urlencoded"
     return headers_dic
