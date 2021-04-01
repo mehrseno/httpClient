@@ -4,6 +4,7 @@ import validators
 import sys
 import warnings
 import re
+import json
 from requests.exceptions import Timeout
 parser = argparse.ArgumentParser(description="httpClient:)")
 parser.add_argument(
@@ -38,7 +39,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--timeout",
-    type = float
+    type=float
 )
 
 parser.add_argument("--json")
@@ -55,7 +56,7 @@ method = args.method
 headers = args.headers
 queries = args.queries
 data = args.data
-json = args.json
+jsn = args.json
 file = args.file
 timeout = args.timeout
 
@@ -109,13 +110,6 @@ def query(queries):
     return queries_dic
 
 
-def request(m, u, h, q, d, j, t):
-    try:
-
-        return requests.request(m, u, headers=h, params=q, data=d, json=j, timeout=t)
-    except Timeout:
-        print('The request timed out')
-        sys.exit()
 
 
 def data_function(headers_dic):
@@ -128,9 +122,22 @@ def data_function(headers_dic):
 
 
 def json_function(headers_dic):
+    try:
+        json.loads(jsn)
+    except:
+        warnings.warn("jason's format is wrong, it must be : application/json")
     if "content-type" not in headers_dic.keys() or headers_dic is None:
         headers_dic["content-type"] = "application/json"
     return headers_dic
+
+
+def request(m, u, h, q, d, j, t):
+    try:
+
+        return requests.request(m, u, headers=h, params=q, data=d, json=j, timeout=t)
+    except Timeout:
+        print('The request timed out')
+        sys.exit()
 
 
 urlCheck(url)
@@ -144,15 +151,15 @@ if queries is not None:
 else:
     queries_dic = None
 
-if data is not None and json is not None:
+if data is not None and jsn is not None:
     print("please enter data or json, not both of them")
     sys.exit()
 else:
     if data:
         headers_dic = data_function(headers_dic)
-    elif json:
+    elif jsn:
         headers_dic = json_function(headers_dic)
-    response = request(method, url, headers_dic, queries_dic, data, json, timeout)
+    response = request(method, url, headers_dic, queries_dic, data, jsn, timeout)
 
 print("\n\n\n", method, response.status_code, response.reason, "\n++++++++++++++++++++++++++++++++++++++++++\n")
 for key, value in response.headers.items():
