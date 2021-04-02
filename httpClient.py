@@ -129,19 +129,19 @@ def data_function(headers_dic):
     flag = bool(re.fullmatch(r"(\w+=\w+)(&\w+=\w+)*", str(data)))
     if flag == False:
         warnings.warn("data's format is wrong, it must be : application/x-www-form-urlencoded")
-    if "content-type" not in headers_dic.keys() :
+    if "content-type" not in headers_dic.keys():
         headers_dic["content-type"] = "application/x-www-form-urlencoded"
 
 
 def json_function(headers_dic):
     try:
-        j = json.loads(jsn)
+        jason = json.loads(jsn)
     except:
         warnings.warn("jason's format is wrong, it must be : application/json")
-        j = jsn
-    if "content-type" not in headers_dic.keys() :
+        jason = jsn
+    if "content-type" not in headers_dic.keys():
         headers_dic["content-type"] = "application/json"
-    return j
+    return jason
 
 
 def request(m, u, h, q, d, j, t, f):
@@ -168,15 +168,16 @@ if data is not None and jsn is not None:
     sys.exit()
 else:
     file_dic = None
+    jason = None
     if data:
        data_function(headers_dic)
     if jsn:
-      j = json_function(headers_dic)
-    elif file:
+      jason = json_function(headers_dic)
+    if file:
         file_dic = file_function(headers_dic)
-    response = request(method, url, headers_dic, queries_dic, data, j, timeout, file_dic)
+    response = request(method, url, headers_dic, queries_dic, data, jason, timeout, file_dic)
 
-print("\n\n\n", method, response.status_code, response.reason, "\n++++++++++++++++++++++++++++++++++++++++++\n")
+print("\n\n\n",response.raw.version, method, response.status_code, response.reason, "\n++++++++++++++++++++++++++++++++++++++++++\n")
 for key, value in response.headers.items():
     print(key, "->", value)
 print("\n++++++++++++++++++++++++++++++++++++++++++\n", response.text)
